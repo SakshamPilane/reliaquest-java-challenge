@@ -6,9 +6,11 @@ import com.challenge.api.service.EmployeeService;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -59,5 +61,30 @@ public class EmployeeController {
     @ResponseStatus(HttpStatus.CREATED)
     public Employee createEmployee(@RequestBody CreateEmployeeRequest requestBody) {
         return employeeService.createEmployee(requestBody);
+    }
+
+    /**
+     * @param uuid Employee UUID
+     * @param requestBody new attribute values for the employee
+     * @return the updated Employee if it exists, otherwise a 404 response.
+     */
+    @PutMapping("/{uuid}")
+    public Employee updateEmployee(@PathVariable UUID uuid, @RequestBody CreateEmployeeRequest requestBody) {
+        Employee updated = employeeService.updateEmployee(uuid, requestBody);
+        if (updated == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found: " + uuid);
+        }
+        return updated;
+    }
+
+    /**
+     * @param uuid Employee UUID
+     */
+    @DeleteMapping("/{uuid}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteEmployee(@PathVariable UUID uuid) {
+        if (!employeeService.deleteEmployee(uuid)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found: " + uuid);
+        }
     }
 }

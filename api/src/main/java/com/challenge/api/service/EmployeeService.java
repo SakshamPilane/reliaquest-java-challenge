@@ -57,6 +57,38 @@ public class EmployeeService {
         return employee;
     }
 
+    /**
+     * Fully replaces the mutable attributes of an existing employee. Server-managed fields (UUID, hire date, termination
+     * date) are preserved.
+     *
+     * @param uuid employee identifier
+     * @param request new attribute values
+     * @return the updated employee, or {@code null} if none exists for the given UUID.
+     */
+    public Employee updateEmployee(UUID uuid, CreateEmployeeRequest request) {
+        Employee existing = employees.get(uuid);
+        if (existing == null) {
+            return null;
+        }
+        existing.setFirstName(request.getFirstName());
+        existing.setLastName(request.getLastName());
+        existing.setSalary(request.getSalary());
+        existing.setAge(request.getAge());
+        existing.setJobTitle(request.getJobTitle());
+        existing.setEmail(request.getEmail());
+        return existing;
+    }
+
+    /**
+     * Removes an employee from the store.
+     *
+     * @param uuid employee identifier
+     * @return {@code true} if an employee was removed, {@code false} if none existed for the given UUID.
+     */
+    public boolean deleteEmployee(UUID uuid) {
+        return employees.remove(uuid) != null;
+    }
+
     private void seedMockEmployees() {
         store(mockEmployee("Ada", "Lovelace", 145000, 36, "Principal Engineer", "ada.lovelace@example.com"));
         store(mockEmployee("Alan", "Turing", 152000, 41, "Engineering Lead", "alan.turing@example.com"));
