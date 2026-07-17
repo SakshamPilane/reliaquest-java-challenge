@@ -22,28 +22,17 @@ public class EmployeeService {
         seedMockEmployees();
     }
 
-    /**
-     * @return every employee currently held, unfiltered.
-     */
+    // Returns every employee currently held, unfiltered.
     public List<Employee> getAllEmployees() {
         return new ArrayList<>(employees.values());
     }
 
-    /**
-     * @param uuid employee identifier
-     * @return the matching employee, or {@code null} if none exists.
-     */
+    // Returns the matching employee, or null if none exists.
     public Employee getEmployeeByUuid(UUID uuid) {
         return employees.get(uuid);
     }
 
-    /**
-     * Creates and stores a new employee from the supplied request. Server-managed fields (UUID, hire date) are assigned
-     * here rather than trusted from the caller.
-     *
-     * @param request attributes for the new employee
-     * @return the persisted employee
-     */
+    // Creates and stores a new employee; UUID and hire date are assigned here, not trusted from the caller.
     public Employee createEmployee(CreateEmployeeRequest request) {
         requireEmailNotTaken(request.getEmail(), null);
 
@@ -61,14 +50,7 @@ public class EmployeeService {
         return employee;
     }
 
-    /**
-     * Fully replaces the mutable attributes of an existing employee. Server-managed fields (UUID, hire date, termination
-     * date) are preserved.
-     *
-     * @param uuid employee identifier
-     * @param request new attribute values
-     * @return the updated employee, or {@code null} if none exists for the given UUID.
-     */
+    // Replaces an existing employee's mutable fields; UUID, hire date and termination date are preserved.
     public Employee updateEmployee(UUID uuid, CreateEmployeeRequest request) {
         Employee existing = employees.get(uuid);
         if (existing == null) {
@@ -84,23 +66,12 @@ public class EmployeeService {
         return existing;
     }
 
-    /**
-     * Removes an employee from the store.
-     *
-     * @param uuid employee identifier
-     * @return the removed employee, or {@code null} if none existed for the given UUID.
-     */
+    // Removes an employee, returning the removed one, or null if none existed.
     public Employee deleteEmployee(UUID uuid) {
         return employees.remove(uuid);
     }
 
-    /**
-     * Guards the email uniqueness constraint. An email may only belong to a single employee.
-     *
-     * @param email the email to validate
-     * @param excludeUuid an employee to ignore during the check (the one being updated), or {@code null} on create
-     * @throws ResponseStatusException 409 Conflict if the email is already used by a different employee
-     */
+    // Enforces email uniqueness; excludeUuid ignores the employee being updated. Throws 409 if the email is taken.
     private void requireEmailNotTaken(String email, UUID excludeUuid) {
         if (email == null) {
             return;

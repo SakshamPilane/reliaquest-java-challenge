@@ -3,10 +3,7 @@ package com.challenge.api.model;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Concrete, in-memory implementation of the {@link Employee} contract. This is the model serialized to and from JSON by
- * the REST layer. In a real system this might be a JPA entity or a projection over the existing employee solution.
- */
+// Concrete Employee implementation serialized to/from JSON by the REST layer.
 public class EmployeeImpl implements Employee {
 
     private UUID uuid;
@@ -50,9 +47,7 @@ public class EmployeeImpl implements Employee {
         this.lastName = lastName;
     }
 
-    /**
-     * @return the explicitly set full name, otherwise a value derived from the first and last name.
-     */
+    // Returns the explicitly set full name, otherwise one derived from first and last name.
     @Override
     public String getFullName() {
         if (fullName != null && !fullName.isBlank()) {
