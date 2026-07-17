@@ -52,3 +52,65 @@ To format code according to style guidelines, you can run **spotlessApply** task
 
 The spotless plugin will also execute check-and-validation tasks as part of the gradle **build** task.
 `./gradlew build`
+
+---
+
+## My Implementation
+
+### How I approached it
+
+I started with the three endpoints the brief asked for, got them working end to end, and then added update and
+delete so the API is a full CRUD resource rather than a partial one. The brief said not to worry about a real
+persistence layer, so I kept the data in memory behind a service and seeded it with a few sample employees. That
+way the project runs straight away, and the "database" question stays out of scope like the challenge intended.
+
+### How the code is laid out
+
+I kept the layers separate so each class has one job and the flow is easy to follow:
+
+- `controller/EmployeeController` — takes the HTTP requests and hands them to the service.
+- `service/EmployeeService` — where the actual logic lives, plus the in-memory store.
+- `model/Employee` and `model/EmployeeImpl` — the interface I was given and the concrete class behind it.
+- `dto/CreateEmployeeRequest` — the shape of the JSON sent in on create and update.
+- `exception/GlobalExceptionHandler` + `exception/ErrorResponse` — one place that turns any error into a tidy JSON body.
+
+One thing I like about this split: the controller never touches the store directly, so if this ever needed a real
+database, I'd only have to change the service — nothing else would notice.
+
+### The endpoints
+
+| Method | Path | What it does | Success |
+| --- | --- | --- | --- |
+| GET | `/api/v1/employee` | Get every employee | 200 |
+| GET | `/api/v1/employee/{uuid}` | Get one employee by UUID | 200 (404 if it isn't there) |
+| POST | `/api/v1/employee` | Create a new employee | 201 |
+| PUT | `/api/v1/employee/{uuid}` | Update an existing employee | 200 (404 if it isn't there) |
+| DELETE | `/api/v1/employee/{uuid}` | Delete an employee and return it | 200 (404 if it isn't there) |
+
+Sample body for create/update:
+
+```json
+{
+  "firstName": "Michael",
+  "lastName": "Scott",
+  "salary": 120000,
+  "age": 45,
+  "jobTitle": "Regional Manager",
+  "email": "michael.scott@example.com"
+}
+```
+
+### A few extras I chose to add
+
+None of these were strictly required, but they felt like the sort of thing you'd want on a real API:
+
+- **Validation on the way in.** I check that the required fields are present and that the email actually looks like
+  an email. If something's off, the request is turned away with a `400` and a message saying what was wrong, so bad
+  data never reaches the service.
+- **No duplicate emails.** An email should belong to one person, so creating or updating to an email that's already
+  taken comes back as a `409 Conflict` rather than quietly creating a second copy.
+- **Errors that all look the same.** Instead of leaking a stack trace, every failure returns the same small JSON
+  shape (timestamp, status, error, message, path), which is much friendlier for whoever's calling the API.
+- **Lombok for the boring bits.** I used `@Getter`/`@Setter` on the model and request classes so they aren't buried
+  under getters and setters. I'd hand-written those first (they're in the earlier commits) before switching over.
+
