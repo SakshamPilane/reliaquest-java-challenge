@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class EmployeeService {
@@ -43,6 +45,8 @@ public class EmployeeService {
      * @return the persisted employee
      */
     public Employee createEmployee(CreateEmployeeRequest request) {
+        requireEmailNotTaken(request.getEmail(), null);
+
         EmployeeImpl employee = new EmployeeImpl();
         employee.setUuid(UUID.randomUUID());
         employee.setFirstName(request.getFirstName());
@@ -70,6 +74,7 @@ public class EmployeeService {
         if (existing == null) {
             return null;
         }
+        requireEmailNotTaken(request.getEmail(), uuid);
         existing.setFirstName(request.getFirstName());
         existing.setLastName(request.getLastName());
         existing.setSalary(request.getSalary());
@@ -87,6 +92,25 @@ public class EmployeeService {
      */
     public boolean deleteEmployee(UUID uuid) {
         return employees.remove(uuid) != null;
+    }
+
+    /**
+     * Guards the email uniqueness constraint. An email may only belong to a single employee.
+     *
+     * @param email the email to validate
+     * @param excludeUuid an employee to ignore during the check (the one being updated), or {@code null} on create
+     * @throws ResponseStatusException 409 Conflict if the email is already used by a different employee
+     */
+    private void requireEmailNotTaken(String email, UUID excludeUuid) {
+        if (email == null) {
+            return;
+        }
+        boolean taken = employees.values().stream()
+                .filter(existing -> !existing.getUuid().equals(excludeUuid))
+                .anyMatch(existing -> email.equalsIgnoreCase(existing.getEmail()));
+        if (taken) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Employee already exists with email: " + email);
+        }
     }
 
     private void seedMockEmployees() {
