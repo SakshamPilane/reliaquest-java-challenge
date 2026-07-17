@@ -23,8 +23,7 @@ public class EmployeeService {
     /**
      * @return every employee currently held, unfiltered.
      */
-    public List<Employee> getAllEmployees()
-    {
+    public List<Employee> getAllEmployees() {
         return new ArrayList<>(employees.values());
     }
 
@@ -32,8 +31,7 @@ public class EmployeeService {
      * @param uuid employee identifier
      * @return the matching employee, or {@code null} if none exists.
      */
-    public Employee getEmployeeByUuid(UUID uuid)
-    {
+    public Employee getEmployeeByUuid(UUID uuid) {
         return employees.get(uuid);
     }
 
@@ -44,8 +42,7 @@ public class EmployeeService {
      * @param request attributes for the new employee
      * @return the persisted employee
      */
-    public Employee createEmployee(CreateEmployeeRequest request)
-    {
+    public Employee createEmployee(CreateEmployeeRequest request) {
         EmployeeImpl employee = new EmployeeImpl();
         employee.setUuid(UUID.randomUUID());
         employee.setFirstName(request.getFirstName());
@@ -60,20 +57,18 @@ public class EmployeeService {
         return employee;
     }
 
-    private void seedMockEmployees()
-    {
+    private void seedMockEmployees() {
         store(mockEmployee("Ada", "Lovelace", 145000, 36, "Principal Engineer", "ada.lovelace@example.com"));
         store(mockEmployee("Alan", "Turing", 152000, 41, "Engineering Lead", "alan.turing@example.com"));
         store(mockEmployee("Grace", "Hopper", 138000, 45, "Staff Engineer", "grace.hopper@example.com"));
     }
 
-    private void store(Employee employee)
-    {
+    private void store(Employee employee) {
         employees.put(employee.getUuid(), employee);
     }
 
-    private Employee mockEmployee(String firstName, String lastName, Integer salary, Integer age, String jobTitle, String email)
-    {
+    private Employee mockEmployee(
+            String firstName, String lastName, Integer salary, Integer age, String jobTitle, String email) {
         EmployeeImpl employee = new EmployeeImpl();
         employee.setUuid(UUID.randomUUID());
         employee.setFirstName(firstName);
