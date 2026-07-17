@@ -88,10 +88,10 @@ public class EmployeeService {
      * Removes an employee from the store.
      *
      * @param uuid employee identifier
-     * @return {@code true} if an employee was removed, {@code false} if none existed for the given UUID.
+     * @return the removed employee, or {@code null} if none existed for the given UUID.
      */
-    public boolean deleteEmployee(UUID uuid) {
-        return employees.remove(uuid) != null;
+    public Employee deleteEmployee(UUID uuid) {
+        return employees.remove(uuid);
     }
 
     /**
