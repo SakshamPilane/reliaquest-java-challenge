@@ -79,12 +79,14 @@ public class EmployeeController {
 
     /**
      * @param uuid Employee UUID
+     * @return the deleted Employee if it existed, otherwise a 404 response.
      */
     @DeleteMapping("/{uuid}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteEmployee(@PathVariable UUID uuid) {
-        if (!employeeService.deleteEmployee(uuid)) {
+    public Employee deleteEmployee(@PathVariable UUID uuid) {
+        Employee deleted = employeeService.deleteEmployee(uuid);
+        if (deleted == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found: " + uuid);
         }
+        return deleted;
     }
 }
