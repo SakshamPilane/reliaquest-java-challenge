@@ -1,12 +1,26 @@
 package com.challenge.api.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class CreateEmployeeRequest {
 
+    @NotBlank(message = "firstName is required")
     private String firstName;
+
+    @NotBlank(message = "lastName is required")
     private String lastName;
-    private Integer salary;
-    private Integer age;
+
+    @NotNull(message = "salary is required") private Integer salary;
+
+    @NotNull(message = "age is required") private Integer age;
+
+    @NotBlank(message = "jobTitle is required")
     private String jobTitle;
+
+    @NotBlank(message = "email is required")
+    @Email(message = "email must be a valid email address")
     private String email;
 
     public String getFirstName() {
